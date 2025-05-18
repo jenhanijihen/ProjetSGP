@@ -10,7 +10,6 @@ public class Technicien {
     private Long id;
     private String nom;
     private String competences;
-
     @ManyToOne
     private Machine machineAssignee;
 

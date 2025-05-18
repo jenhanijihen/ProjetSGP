@@ -1,8 +1,14 @@
 package com.jihenjenhani.projetsgp.controller;
 
-
+import com.jihenjenhani.projetsgp.dto.MaintenanceDTO;
 import com.jihenjenhani.projetsgp.entity.Maintenance;
+import com.jihenjenhani.projetsgp.entity.Machine;
+import com.jihenjenhani.projetsgp.entity.Produit;
+import com.jihenjenhani.projetsgp.entity.Technicien;
+import com.jihenjenhani.projetsgp.mapper.ObjectMapperUtils;
+import com.jihenjenhani.projetsgp.service.MachineService;
 import com.jihenjenhani.projetsgp.service.MaintenanceService;
+import com.jihenjenhani.projetsgp.service.TechnicienService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,43 +16,74 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/maintenances")
-@CrossOrigin("*")
 public class MaintenanceController {
-    private final MaintenanceService service;
 
-    public MaintenanceController(MaintenanceService service) {
+    private final MaintenanceService service;
+    private final MachineService machineService;
+    private final TechnicienService technicienService;
+
+    public MaintenanceController(MaintenanceService service, MachineService machineService, TechnicienService technicienService) {
         this.service = service;
+        this.machineService = machineService;
+        this.technicienService = technicienService;
     }
 
     @GetMapping
-    public List<Maintenance> getAll() {
-        return service.findAll();
+    public ResponseEntity<List<MaintenanceDTO>> getAll() {
+        return ResponseEntity.ok(ObjectMapperUtils.mapAll(service.findAll(), MaintenanceDTO.class));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Maintenance> getById(@PathVariable Long id) {
+    public ResponseEntity<MaintenanceDTO> getById(@PathVariable Long id) {
         return service.findById(id)
-                .map(ResponseEntity::ok)
+                .map(m -> ResponseEntity.ok(ObjectMapperUtils.map(m, MaintenanceDTO.class)))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Maintenance create(@RequestBody Maintenance maintenance) {
-        return service.save(maintenance);
+    public ResponseEntity<?> create(@RequestBody MaintenanceDTO dto) {
+        Machine machine = dto.getMachine();
+        Technicien technicien = dto.getTechnicien();
+
+        if (machine == null || technicien == null) {
+            return ResponseEntity.badRequest().body("Machine ou Technicien introuvable");
+        }
+
+        Maintenance entity = ObjectMapperUtils.map(dto, Maintenance.class);
+        entity.setMachine(machine);
+        entity.setTechnicien(technicien);
+
+        Maintenance saved = service.save(entity);
+        return ResponseEntity.ok(ObjectMapperUtils.map(saved, MaintenanceDTO.class));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Maintenance> update(@PathVariable Long id, @RequestBody Maintenance maintenance) {
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody MaintenanceDTO dto) {
         return service.findById(id)
                 .map(existing -> {
-                    maintenance.setId(id);
-                    return ResponseEntity.ok(service.save(maintenance));
+                    Machine machine =dto.getMachine();
+                    Technicien technicien = dto.getTechnicien();
+
+                    if (machine == null || technicien == null) {
+                        return ResponseEntity.badRequest().body("Machine ou Technicien introuvable");
+                    }
+
+                    Maintenance toUpdate = ObjectMapperUtils.map(dto, Maintenance.class);
+                    toUpdate.setId(id);
+                    toUpdate.setMachine(machine);
+                    toUpdate.setTechnicien(technicien);
+
+                    Maintenance updated = service.save(toUpdate);
+                    return ResponseEntity.ok(ObjectMapperUtils.map(updated, MaintenanceDTO.class));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        service.delete(id);
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        return service.findById(id).map(m -> {
+            service.delete(id);
+            return ResponseEntity.ok().<Void>build();
+        }).orElse(ResponseEntity.notFound().build());
     }
 }

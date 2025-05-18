@@ -5,7 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 @Entity
 public class Machine {
@@ -14,7 +14,7 @@ public class Machine {
     private Long id;
     private String nom;
     private String etat;
-    private LocalDate maintenanceProchaine;
+    private Date maintenanceProchaine;
 
     public Long getId() {
         return id;
@@ -40,11 +40,11 @@ public class Machine {
         this.etat = etat;
     }
 
-    public LocalDate getMaintenanceProchaine() {
+    public Date getMaintenanceProchaine() {
         return maintenanceProchaine;
     }
 
-    public void setMaintenanceProchaine(LocalDate maintenanceProchaine) {
+    public void setMaintenanceProchaine(Date maintenanceProchaine) {
         this.maintenanceProchaine = maintenanceProchaine;
     }
 }

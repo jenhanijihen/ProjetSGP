@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 
 import java.time.LocalDate;
+import java.util.Date;
 
 @Entity
 
@@ -18,7 +19,7 @@ public class Maintenance {
     @ManyToOne
     private Technicien technicien;
 
-    private LocalDate date;
+    private Date date;
     private String type;
 
     public Long getId() {
@@ -45,11 +46,11 @@ public class Maintenance {
         this.technicien = technicien;
     }
 
-    public LocalDate getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 

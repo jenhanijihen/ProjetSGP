@@ -1,14 +1,19 @@
 package com.jihenjenhani.projetsgp.dto;
 
+import com.jihenjenhani.projetsgp.entity.Machine;
+import com.jihenjenhani.projetsgp.entity.Produit;
+import com.jihenjenhani.projetsgp.entity.StatutOrdre;
+
 import java.util.Date;
 
 public class OrdreFabricationDTO {
     private Long id;
-    private Long produitId;
-    private Long machineId;
+    private Produit produit;
+    private Machine machine;
+
     private int quantite;
     private Date date;
-    private String statut;
+    private StatutOrdre statut;
 
     // Getters et Setters
     public Long getId() {
@@ -19,20 +24,20 @@ public class OrdreFabricationDTO {
         this.id = id;
     }
 
-    public Long getProduitId() {
-        return produitId;
+    public Produit getProduit() {
+        return produit;
     }
 
-    public void setProduitId(Long produitId) {
-        this.produitId = produitId;
+    public void setProduit(Produit produit) {
+        this.produit = produit;
     }
 
-    public Long getMachineId() {
-        return machineId;
+    public Machine getMachine() {
+        return machine;
     }
 
-    public void setMachineId(Long machineId) {
-        this.machineId = machineId;
+    public void setMachine(Machine machine) {
+        this.machine = machine;
     }
 
     public int getQuantite() {
@@ -51,11 +56,12 @@ public class OrdreFabricationDTO {
         this.date = date;
     }
 
-    public String getStatut() {
+    public StatutOrdre getStatut() {
         return statut;
     }
 
-    public void setStatut(String statut) {
+    public void setStatut(StatutOrdre statut) {
         this.statut = statut;
     }
+
 }

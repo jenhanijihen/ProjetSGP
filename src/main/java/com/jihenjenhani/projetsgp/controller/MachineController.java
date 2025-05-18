@@ -1,6 +1,8 @@
 package com.jihenjenhani.projetsgp.controller;
 
+import com.jihenjenhani.projetsgp.dto.MachineDTO;
 import com.jihenjenhani.projetsgp.entity.Machine;
+import com.jihenjenhani.projetsgp.mapper.ObjectMapperUtils;
 import com.jihenjenhani.projetsgp.service.MachineService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,8 +11,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/machines")
-@CrossOrigin("*")
 public class MachineController {
+
     private final MachineService service;
 
     public MachineController(MachineService service) {
@@ -18,34 +20,41 @@ public class MachineController {
     }
 
     @GetMapping
-    public List<Machine> getAll() {
-        return service.findAll();
+    public ResponseEntity<List<MachineDTO>> getAll() {
+        return ResponseEntity.ok(ObjectMapperUtils.mapAll(service.findAll(), MachineDTO.class));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Machine> getById(@PathVariable Long id) {
+    public ResponseEntity<MachineDTO> getById(@PathVariable Long id) {
         return service.findById(id)
-                .map(ResponseEntity::ok)
+                .map(m -> ResponseEntity.ok(ObjectMapperUtils.map(m, MachineDTO.class)))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Machine create(@RequestBody Machine machine) {
-        return service.save(machine);
+    public ResponseEntity<MachineDTO> create(@RequestBody MachineDTO dto) {
+        Machine machine = ObjectMapperUtils.map(dto, Machine.class);
+        Machine saved = service.save(machine);
+        return ResponseEntity.ok(ObjectMapperUtils.map(saved, MachineDTO.class));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Machine> update(@PathVariable Long id, @RequestBody Machine machine) {
+    public ResponseEntity<MachineDTO> update(@PathVariable Long id, @RequestBody MachineDTO dto) {
         return service.findById(id)
                 .map(existing -> {
-                    machine.setId(id);
-                    return ResponseEntity.ok(service.save(machine));
+                    Machine toUpdate = ObjectMapperUtils.map(dto, Machine.class);
+                    toUpdate.setId(id);
+                    Machine updated = service.save(toUpdate);
+                    return ResponseEntity.ok(ObjectMapperUtils.map(updated, MachineDTO.class));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        service.delete(id);
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        return service.findById(id).map(machine -> {
+            service.delete(id);
+            return ResponseEntity.ok().<Void>build();
+        }).orElse(ResponseEntity.notFound().build());
     }
 }

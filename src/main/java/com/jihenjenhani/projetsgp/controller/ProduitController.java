@@ -1,6 +1,8 @@
 package com.jihenjenhani.projetsgp.controller;
 
+import com.jihenjenhani.projetsgp.dto.ProduitDTO;
 import com.jihenjenhani.projetsgp.entity.Produit;
+import com.jihenjenhani.projetsgp.mapper.ObjectMapperUtils;
 import com.jihenjenhani.projetsgp.service.ProduitService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,7 +11,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/produits")
-@CrossOrigin("*")
 public class ProduitController {
 
     private final ProduitService service;
@@ -19,34 +20,44 @@ public class ProduitController {
     }
 
     @GetMapping
-    public List<Produit> getAll() {
-        return service.findAll();
+    public ResponseEntity<List<ProduitDTO>> getAll() {
+        List<ProduitDTO> produits = ObjectMapperUtils.mapAll(service.findAll(), ProduitDTO.class);
+        return ResponseEntity.ok(produits);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Produit> getById(@PathVariable Long id) {
+    public ResponseEntity<ProduitDTO> getById(@PathVariable Long id) {
         return service.findById(id)
-                .map(ResponseEntity::ok)
+                .map(produit -> ResponseEntity.ok(ObjectMapperUtils.map(produit, ProduitDTO.class)))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Produit create(@RequestBody Produit produit) {
-        return service.save(produit);
+    public ResponseEntity<ProduitDTO> create(@RequestBody ProduitDTO dto) {
+        Produit produit = ObjectMapperUtils.map(dto, Produit.class);
+        Produit saved = service.save(produit);
+        return ResponseEntity.ok(ObjectMapperUtils.map(saved, ProduitDTO.class));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Produit> update(@PathVariable Long id, @RequestBody Produit produit) {
+    public ResponseEntity<ProduitDTO> update(@PathVariable Long id, @RequestBody ProduitDTO dto) {
         return service.findById(id)
                 .map(existing -> {
-                    produit.setId(id);
-                    return ResponseEntity.ok(service.save(produit));
+                    Produit toUpdate = ObjectMapperUtils.map(dto, Produit.class);
+                    toUpdate.setId(id);
+                    Produit updated = service.save(toUpdate);
+                    return ResponseEntity.ok(ObjectMapperUtils.map(updated, ProduitDTO.class));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        service.delete(id);
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        return service.findById(id)
+                .map(produit -> {
+                    service.delete(id);
+                    return ResponseEntity.ok().<Void>build();
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 }
