@@ -16,14 +16,12 @@ Le système permet :
 
 ### Backend
 - Java 17
-- Spring Boot 3+
+- Spring Boot
 - Spring Data JPA
-- H2 Database (ou autre)
-- Maven
-- MapStruct (pour mapping DTOs)
+- Postgres sql
 
 ### Frontend
-- Angular 16+
+- Angular 16.2.9
 - TypeScript
 - Bootstrap 5
 - Angular Forms & Reactive Forms
@@ -37,13 +35,11 @@ Le système permet :
 ## 📦 Installation & Exécution
 
 ### Prérequis
-- Docker & Docker Compose
-- Node.js (si tu veux exécuter Angular sans Docker)
+- Dockerfile
+- Dockercompose
+- nginx.conf
 
-### ⚙️ Lancement via Docker (recommandé)
+### ⚙️ Lancement via Docker
 
-1. Cloner le projet :
-   ```bash
-   git clone https://github.com/ton-utilisateur/projet-sgp.git
-   cd projet-sgp
+1.
 
