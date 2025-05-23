@@ -39,7 +39,3 @@ Le système permet :
 - Dockercompose
 - nginx.conf
 
-### ⚙️ Lancement via Docker
-
-1.
-
