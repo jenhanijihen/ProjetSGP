@@ -32,7 +32,7 @@ Le système permet :
 
 ---
 
-## 📦 Installation & Exécution
+## 📦 Utilisation de Docker pour le déploiement
 
 ### Prérequis
 - Dockerfile
