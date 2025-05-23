@@ -57,4 +57,12 @@ public class MachineController {
             return ResponseEntity.ok().<Void>build();
         }).orElse(ResponseEntity.notFound().build());
     }
+    @GetMapping("/etat/{etat}")
+    public ResponseEntity<List<MachineDTO>> getByEtat(@PathVariable String etat) {
+        List<Machine> machines = service.findByEtat(etat);
+        return ResponseEntity.ok(ObjectMapperUtils.mapAll(machines, MachineDTO.class));
+    }
+
+
+
 }

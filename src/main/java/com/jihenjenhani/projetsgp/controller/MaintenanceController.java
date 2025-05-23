@@ -53,9 +53,20 @@ public class MaintenanceController {
         entity.setMachine(machine);
         entity.setTechnicien(technicien);
 
+
+        // mise à jour de l'état de la machine
+        machine.setEtat("EN_MAINTENANCE");
+        machineService.save(machine);
+
+        // mise à jour du technicien avec machine assignée
+        technicien.setMachineAssignee(machine);
+        technicienService.save(technicien); // AJOUTE CETTE LIGNE pour persister
+
         Maintenance saved = service.save(entity);
         return ResponseEntity.ok(ObjectMapperUtils.map(saved, MaintenanceDTO.class));
     }
+
+
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody MaintenanceDTO dto) {
@@ -86,4 +97,28 @@ public class MaintenanceController {
             return ResponseEntity.ok().<Void>build();
         }).orElse(ResponseEntity.notFound().build());
     }
+    @PatchMapping("/{id}/terminer")
+    public ResponseEntity<?> terminerMaintenance(@PathVariable Long id) {
+        return service.findById(id).map(maintenance -> {
+            Machine machine = maintenance.getMachine();
+            Technicien technicien = maintenance.getTechnicien();
+
+            if (machine != null) {
+                machine.setEtat("EN_MARCHE");
+                machineService.save(machine);
+            }
+
+            if (technicien != null) {
+                technicien.setMachineAssignee(null); // Libère le technicien
+                technicienService.save(technicien);
+            }
+
+//            service.save(maintenance); // persisté
+//            service.delete(id); // supprime la maintenance après
+            return ResponseEntity.ok().build();
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+
+
 }

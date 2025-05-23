@@ -36,4 +36,6 @@ public class TechnicienServiceImpl implements TechnicienService {
     public void delete(Long id) {
         repository.deleteById(id);
     }
+
+
 }

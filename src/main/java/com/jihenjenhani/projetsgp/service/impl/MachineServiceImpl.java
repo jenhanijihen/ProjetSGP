@@ -36,4 +36,10 @@ public class MachineServiceImpl implements MachineService {
     public void delete(Long id) {
         repository.deleteById(id);
     }
+    @Override
+    public List<Machine> findByEtat(String etat) {
+        return repository.findByEtat(etat);
+    }
+
+
 }

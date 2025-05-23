@@ -10,4 +10,6 @@ public interface MachineService {
     Optional<Machine> findById(Long id);
     Machine save(Machine machine);
     void delete(Long id);
+    List<Machine> findByEtat(String etat);
+
 }

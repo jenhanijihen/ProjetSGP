@@ -4,6 +4,7 @@ import com.jihenjenhani.projetsgp.dto.OrdreFabricationDTO;
 import com.jihenjenhani.projetsgp.entity.Machine;
 import com.jihenjenhani.projetsgp.entity.OrdreFabrication;
 import com.jihenjenhani.projetsgp.entity.Produit;
+import com.jihenjenhani.projetsgp.entity.StatutOrdre;
 import com.jihenjenhani.projetsgp.mapper.ObjectMapperUtils;
 import com.jihenjenhani.projetsgp.service.MachineService;
 import com.jihenjenhani.projetsgp.service.OrdreFabricationService;
@@ -53,6 +54,9 @@ public class OrdreFabricationController {
         OrdreFabrication entity = ObjectMapperUtils.map(dto, OrdreFabrication.class);
         entity.setProduit(produit);
         entity.setMachine(machine);
+        entity.setStatut(StatutOrdre.EN_ATTENTE);
+
+
 
         OrdreFabrication saved = service.save(entity);
         return ResponseEntity.ok(ObjectMapperUtils.map(saved, OrdreFabricationDTO.class));
@@ -86,4 +90,28 @@ public class OrdreFabricationController {
             return ResponseEntity.ok().<Void>build();
         }).orElse(ResponseEntity.notFound().build());
     }
+    @PatchMapping("/{id}/lancer")
+    public ResponseEntity<?> lancer(@PathVariable Long id) {
+        return service.findById(id).map(ordre -> {
+            ordre.setStatut(StatutOrdre.EN_PRODUCTION);
+            ordre.getMachine().setEtat("EN_MAINTENANCE");
+            service.save(ordre); // Machine est mise à jour automatiquement si cascade = true
+            return ResponseEntity.ok().build();
+        }).orElse(ResponseEntity.notFound().build());
+    }
+    @PatchMapping("/{id}/terminer")
+    public ResponseEntity<?> terminer(@PathVariable Long id) {
+        return service.findById(id).map(ordre -> {
+            ordre.setStatut(StatutOrdre.TERMINE);
+
+            Produit produit = ordre.getProduit();
+            produit.setStock(produit.getStock() + ordre.getQuantite());
+
+            service.save(ordre); // Sauve aussi produit si cascade bien configurée
+            return ResponseEntity.ok().build();
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+
+
 }
