@@ -17,7 +17,6 @@ Le système permet :
 ### Backend
 - Java 17
 - Spring Boot
-- Spring Data JPA
 - Postgres sql
 
 ### Frontend
